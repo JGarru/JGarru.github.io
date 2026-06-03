@@ -23,8 +23,19 @@ Bonn, Germany
 </p>
 
 <p>
-<b>Email:</b> <a href="mailto:jgarruesapece@gmail.com">jgarruesapece@gmail.com</a><br>
-<b>Phone:</b> +34 606 58 04 09<br>
+<b>Email:</b>
+<span id="email-puzzle">
+  What is 7 &times; 3?
+  <input type="text" id="math-answer" size="3" maxlength="4">
+  <input type="button" value="OK" onclick="
+    if(document.getElementById('math-answer').value.trim()==='21'){
+      document.getElementById('email-puzzle').innerHTML='<a href=\'mailto:jgarruesapece@gmail.com\'>jgarruesapece@gmail.com</a>';
+    } else {
+      document.getElementById('math-answer').value='';
+      document.getElementById('math-answer').placeholder='try again';
+    }
+  ">
+</span><br>
 <b>LinkedIn:</b> <a href="https://www.linkedin.com/in/mathsandai">linkedin.com/in/mathsandai</a>
 </p>
 
