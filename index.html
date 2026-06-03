@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Javier Garrues Apecechea</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#551A8B" alink="#FF0000">
+
+<table width="600" border="0" cellpadding="4" cellspacing="0">
+<tr>
+<td>
+
+<h1>Javier Garrues Apecechea</h1>
+
+<hr>
+
+<p>
+<b>M.Sc. Student</b><br>
+<a href="https://www.mathematics.uni-bonn.de/">Mathematical Institute</a> &amp;
+<a href="https://www.informatik.uni-bonn.de/">Department of Computer Science</a><br>
+University of Bonn<br>
+Bonn, Germany
+</p>
+
+<p>
+<b>Email:</b> <a href="mailto:jgarruesapece@gmail.com">jgarruesapece@gmail.com</a><br>
+<b>Phone:</b> +34 606 58 04 09<br>
+<b>LinkedIn:</b> <a href="https://www.linkedin.com/in/mathsandai">linkedin.com/in/mathsandai</a>
+</p>
+
+<hr>
+
+<h2>Research Interests</h2>
+
+<p>
+Mathematical Foundations of Artificial Intelligence,
+Geometric and Topological Deep Learning,
+and Physics-Informed Machine Learning.
+</p>
+
+<hr>
+
+<h2>Education</h2>
+
+<dl>
+<dt><b>M.Sc. Mathematics &amp; M.Sc. Computer Science</b></dt>
+<dd>
+University of Bonn, Bonn, Germany. Oct 2024 &ndash; present.<br>
+Focus: Geometry, Computational Topology and ML.
+</dd>
+
+<br>
+
+<dt><b>B.Sc. Mathematics &amp; B.Sc. Computer Science</b></dt>
+<dd>
+University of Granada, Granada, Spain. Sept 2019 &ndash; July 2024.<br>
+Focus: Geometry, Statistics and ML.<br>
+Top 6% of class.
+</dd>
+</dl>
+
+<hr>
+
+<h2>Experience</h2>
+
+<dl>
+<dt><b>AI &amp; Machine Learning Intern</b>, Sep 2025 &ndash; Jan 2026</dt>
+<dd>
+<a href="https://www.esa.int/About_Us/ESOC">European Space Agency (ESA) &mdash; ESOC</a>, Darmstadt, Germany.<br>
+Research on Physics-Informed Machine Learning for Prognostics and Health Management (PHM).<br>
+Supervised by Dr. F. Antonello (PoliMi &amp; MIT).
+</dd>
+
+<br>
+
+<dt><b>Quantitative Modelling Intern</b>, Jun 2023 &ndash; Aug 2023</dt>
+<dd>
+Banco Santander Corp. &amp; Investment Banking, Madrid, Spain.<br>
+Built a stochastic correlation calibration model and pipeline.
+</dd>
+</dl>
+
+<hr>
+
+<p><i>A full curriculum vitae is available upon request.</i></p>
+
+<hr>
+
+<p align="center">
+<canvas id="constructGif" width="400" height="40" style="display:block;margin:0 auto;"></canvas>
+<script type="text/javascript">
+// Animated "under construction" banner drawn on canvas
+(function(){
+  var c = document.getElementById('constructGif');
+  var ctx = c.getContext('2d');
+  var frame = 0;
+  var colors = ['#FFD700','#000000'];
+  function drawStripes(offset){
+    var stripeW = 20;
+    ctx.clearRect(0,0,400,40);
+    for(var x=-stripeW; x<420; x+=stripeW*2){
+      ctx.fillStyle = '#FFD700';
+      ctx.fillRect(x+offset,0,stripeW,40);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(x+offset+stripeW,0,stripeW,40);
+    }
+    // border
+    ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.strokeRect(1,1,398,38);
+    // text
+    ctx.fillStyle='#CC0000';
+    ctx.font='bold 15px "Courier New", monospace';
+    ctx.textAlign='center';
+    ctx.shadowColor='#FFFF00';ctx.shadowBlur=3;
+    ctx.fillText('*** UNDER CONSTRUCTION ***',200,26);
+    ctx.shadowBlur=0;
+    // hard hat icon
+    ctx.font='20px serif';
+    ctx.fillText('\u26A7',22,26);
+    ctx.fillText('\u26A7',375,26);
+  }
+  function animate(){
+    frame = (frame+1)%40;
+    drawStripes(frame);
+    setTimeout(animate, 80);
+  }
+  animate();
+})();
+</script>
+<br><font size="-1"><b>*** THIS PAGE IS UNDER CONSTRUCTION ***</b></font>
+</p>
+
+<p align="center">
+<font size="-1">
+You are visitor number:<br>
+<font face="Courier New" size="+2"><b id="counter">000000</b></font><br>
+<font size="-2">(since 1 September 2024)</font>
+</font>
+</p>
+
+<script type="text/javascript">
+var base = 3241;
+try {
+  var stored = parseInt(localStorage.getItem('visits_javier') || '0');
+  stored = stored + 1;
+  localStorage.setItem('visits_javier', stored);
+  var total = base + stored;
+} catch(e) {
+  var total = base + 1;
+}
+var padded = String(total).padStart(6, '0');
+document.getElementById('counter').textContent = padded;
+</script>
+
+<hr>
+
+<p>
+<font size="-1">
+Last modified: June 2026.<br>
+<a href="http://validator.w3.org/check?uri=referer">
+<img src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01" border="0" height="31" width="88">
+</a>
+</font>
+</p>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
