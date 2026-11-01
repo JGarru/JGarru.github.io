@@ -44,12 +44,13 @@
   /* the hard cover */
   .cover { background: #2B2A26; color: #F3F0E8; display: flex; flex-direction: column; align-items: center;
            justify-content: center; cursor: pointer; border-radius: 0 5px 5px 0; }
-  .cover .frame { width: 220px; height: 220px; border: 1px solid rgba(243,240,232,.45); display: flex;
+  .cover .frame { width: 250px; height: 250px; background: #fff; border: 1px solid rgba(243,240,232,.45); display: flex;
            align-items: center; justify-content: center; overflow: hidden; }
   .cover .frame img { width: 100%; height: 100%; object-fit: cover; }
   .cover .frame span { font: 11px "Courier New", monospace; letter-spacing: .08em; opacity: .6; text-transform: uppercase; }
   .cover h1 { font-weight: normal; font-size: 30px; margin: 28px 0 6px; letter-spacing: .01em; }
   .cover p { margin: 0; font-size: 14px; font-style: italic; opacity: .8; }
+  .cover .credit { position: absolute; bottom: 14px; font: 10px "Courier New", monospace; opacity: .55; }
   .cover::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px;
            background: linear-gradient(to right, rgba(0,0,0,.45), rgba(255,255,255,.06)); }
 
@@ -91,7 +92,7 @@
    NOTES: one entry per page, in reading order. Put each Google Drive
    share link in "link" (leave "" until you have it).
    ------------------------------------------------------------------ */
-var COVER_IMAGE = "";
+var COVER_IMAGE = "notes/book-cover.jpg";
 var NOTES = [
   { title: "Algebra I",                                   img: "notes/covers/algebra-i.jpg",                  link: "" },
   { title: "Algebraic Geometry I",                        img: "notes/covers/algebraic-geometry-i.jpg",       link: "" },
@@ -136,7 +137,7 @@ var NOTES = [
   var leaves = [];
   var c = el('div', 'face front cover');
   c.innerHTML = '<div class="frame">' + (COVER_IMAGE ? '<img src="' + COVER_IMAGE + '" alt="">' : '<span>picture</span>') + '</div>' +
-                '<h1>M.Sc. Notes</h1><p>University of Bonn</p>';
+                '<h1>M.Sc. Notes</h1><p>University of Bonn</p>' + (COVER_IMAGE ? '<div class="credit">cover comic: The Jenkins</div>' : '');
   c.addEventListener('click', function (ev) { ev.stopPropagation(); next(); });
   var toc = el('div', 'face back inside');
   var list = '<h2>Contents</h2><ol>';
