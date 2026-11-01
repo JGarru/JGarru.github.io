@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M.Sc. Notes &mdash; Javier Garrues Apecechea</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #FFFFFF; }
+  body { font-family: Georgia, "Times New Roman", serif; color: #1A1915; overflow: hidden; }
+  a.back { position: fixed; top: 14px; left: 16px; font-size: 14px; color: #0000CC; z-index: 10; }
+  a.back:visited { color: #551A8B; }
+
+  #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #scaler { transform-origin: center center; }
+
+  /* one page = 340 x 481 (A4 ratio) ; open spread = 680 wide */
+  .book { position: relative; width: 680px; height: 481px; perspective: 2200px;
+          transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .book.closed { transform: translateX(-170px); }
+  .book.ended  { transform: translateX(170px); }
+
+  .leaf { position: absolute; left: 340px; top: 0; width: 340px; height: 481px;
+          transform-origin: left center; transform-style: preserve-3d;
+          transition: transform .9s cubic-bezier(.3,.6,.2,1); }
+  .leaf.flipped { transform: rotateY(-180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+          overflow: hidden; background: #F3F0E8; }
+  .face.back { transform: rotateY(180deg); }
+  .face img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+
+  /* soft page shading towards the spine */
+  .face.front::after, .face.back::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+  .face.front::after { background: linear-gradient(to right, rgba(0,0,0,.14), rgba(0,0,0,0) 9%); }
+  .face.back::after  { background: linear-gradient(to left,  rgba(0,0,0,.14), rgba(0,0,0,0) 9%); }
+  .face.front { box-shadow: 2px 3px 10px rgba(0,0,0,.18); border-radius: 0 3px 3px 0; }
+  .face.back  { box-shadow: -2px 3px 10px rgba(0,0,0,.18); border-radius: 3px 0 0 3px; }
+
+  .face.link { cursor: pointer; }
+  .face.link:hover img { filter: brightness(1.03); }
+  .face .open-hint { position: absolute; right: 12px; bottom: 10px; font: 11px "Courier New", monospace;
+          color: #5E5B52; background: rgba(243,240,232,.9); padding: 2px 6px; opacity: 0; transition: opacity .2s; }
+  .face.link:hover .open-hint { opacity: 1; }
+
+  /* the hard cover */
+  .cover { background: #2B2A26; color: #F3F0E8; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; cursor: pointer; border-radius: 0 5px 5px 0; }
+  .cover .frame { width: 220px; height: 220px; border: 1px solid rgba(243,240,232,.45); display: flex;
+           align-items: center; justify-content: center; overflow: hidden; }
+  .cover .frame img { width: 100%; height: 100%; object-fit: cover; }
+  .cover .frame span { font: 11px "Courier New", monospace; letter-spacing: .08em; opacity: .6; text-transform: uppercase; }
+  .cover h1 { font-weight: normal; font-size: 30px; margin: 28px 0 6px; letter-spacing: .01em; }
+  .cover p { margin: 0; font-size: 14px; font-style: italic; opacity: .8; }
+  .cover::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px;
+           background: linear-gradient(to right, rgba(0,0,0,.45), rgba(255,255,255,.06)); }
+
+  .inside { background: #F3F0E8; padding: 36px 36px; box-sizing: border-box; }
+  .inside h2 { font-weight: normal; font-size: 22px; margin: 0 0 18px; }
+  .inside ol { margin: 0; padding-left: 22px; font-size: 13px; line-height: 1.6; }
+  .inside ol a { color: #1A1915; text-decoration: none; border-bottom: 1px dotted #8C887D; cursor: pointer; }
+  .inside ol a:hover { color: #B5532F; border-color: #B5532F; }
+  .inside .small { margin-top: 16px; font: 11px "Courier New", monospace; color: #5E5B52; }
+
+  .endpaper { background: #2B2A26; border-radius: 5px 0 0 5px; }
+
+  #nav { position: fixed; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; align-items: center;
+         gap: 18px; font: 13px "Courier New", monospace; color: #5E5B52; }
+  #nav button { font: inherit; background: none; border: 1px solid #C9C5BA; color: #1A1915; width: 44px; height: 44px;
+         border-radius: 50%; cursor: pointer; }
+  #nav button:disabled { opacity: .3; cursor: default; }
+  #nav button:not(:disabled):hover { border-color: #1A1915; }
+  #hint { position: fixed; left: 0; right: 0; top: 18px; text-align: center; font: 12px "Courier New", monospace; color: #8C887D; }
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; back to homepage</a>
+<div id="hint">click the book to open it</div>
+
+<div id="stage"><div id="scaler"><div class="book closed" id="book"></div></div></div>
+
+<div id="nav">
+  <button id="prev" aria-label="Previous page">&larr;</button>
+  <span id="count"></span>
+  <button id="next" aria-label="Next page">&rarr;</button>
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   EDIT HERE
+   COVER_IMAGE: the picture on the front of the book (e.g. "notes/book-cover.jpg").
+   NOTES: one entry per page, in reading order. Put each Google Drive
+   share link in "link" (leave "" until you have it).
+   ------------------------------------------------------------------ */
+var COVER_IMAGE = "";
+var NOTES = [
+  { title: "Algebra I",                                   img: "notes/covers/algebra-i.jpg",                  link: "" },
+  { title: "Algebraic Geometry I",                        img: "notes/covers/algebraic-geometry-i.jpg",       link: "" },
+  { title: "Elliptic Curves",                             img: "notes/covers/elliptic-curves.jpg",            link: "" },
+  { title: "Topology I",                                  img: "notes/covers/topology-i.jpg",                 link: "" },
+  { title: "Geometric Structures on Manifolds",           img: "notes/covers/geometric-structures.jpg",       link: "" },
+  { title: "Minimal Surfaces",                            img: "notes/covers/minimal-surfaces.jpg",           link: "" },
+  { title: "Geometric Group Theory",                      img: "notes/covers/geometric-group-theory.jpg",     link: "" },
+  { title: "Random Walks in Groups",                      img: "notes/covers/random-walks.jpg",               link: "" },
+  { title: "Diagrammatic Algebra",                        img: "notes/covers/diagrammatic-algebra.jpg",       link: "https://drive.google.com/file/d/1CrRer3EdQqvxwZx0-89vU_lk4XAT7zuM/view?usp=sharing" },
+  { title: "Computability",                               img: "notes/covers/computability.jpg",              link: "" },
+  { title: "Combinatorial Optimization",                  img: "notes/covers/combinatorial-optimization.jpg", link: "" },
+  { title: "Applications of Computational Topology in Information Theory", img: "notes/covers/computational-topology.jpg", link: "" },
+  { title: "Algorithmic Knot Theory",                     img: "notes/covers/algorithmic-knot-theory.jpg",    link: "" },
+  { title: "Geometric Deep Learning",                     img: "notes/covers/geometric-deep-learning.jpg",    link: "" }
+];
+
+(function () {
+  var book = document.getElementById('book');
+  var prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next');
+  var countEl = document.getElementById('count'), hint = document.getElementById('hint');
+
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+  function notePage(i, side) {
+    var n = NOTES[i], f = el('div', 'face ' + side);
+    if (!n) { f.style.background = '#F3F0E8'; return f; }
+    var img = el('img'); img.src = n.img; img.alt = n.title + ' — lecture notes cover'; img.loading = 'lazy';
+    f.appendChild(img);
+    if (n.link) {
+      f.className += ' link'; f.title = 'Open ' + n.title + ' notes';
+      f.appendChild(el('span', 'open-hint', 'open notes &#8599;'));
+      f.addEventListener('click', function (ev) { ev.stopPropagation(); window.open(n.link, '_blank', 'noopener'); });
+    } else {
+      f.addEventListener('click', function (ev) { ev.stopPropagation(); side === 'front' ? next() : prev(); });
+    }
+    return f;
+  }
+
+  // Build leaves: [cover | contents], [note0 | note1], [note2 | note3], ... , last back = endpaper
+  var leaves = [];
+  var c = el('div', 'face front cover');
+  c.innerHTML = '<div class="frame">' + (COVER_IMAGE ? '<img src="' + COVER_IMAGE + '" alt="">' : '<span>picture</span>') + '</div>' +
+                '<h1>M.Sc. Notes</h1><p>University of Bonn</p>';
+  c.addEventListener('click', function (ev) { ev.stopPropagation(); next(); });
+  var toc = el('div', 'face back inside');
+  var list = '<h2>Contents</h2><ol>';
+  NOTES.forEach(function (n, i) { list += '<li><a data-i="' + i + '">' + esc(n.title) + '</a></li>'; });
+  toc.innerHTML = list + '</ol><div class="small">click a page to open its notes</div>';
+  toc.addEventListener('click', function (ev) {
+    var a = ev.target.closest('a[data-i]'); ev.stopPropagation();
+    if (a) goTo(1 + Math.ceil(Number(a.getAttribute('data-i')) / 2));
+  });
+  leaves.push([c, toc]);
+  for (var i = 0; i < NOTES.length; i += 2) {
+    var back = (i + 1 < NOTES.length) ? notePage(i + 1, 'back') : el('div', 'face back endpaper');
+    leaves.push([notePage(i, 'front'), back]);
+  }
+  if (NOTES.length % 2 === 0) { // closing hard cover
+    var bc = el('div', 'face front cover'); bc.innerHTML = '';
+    leaves.push([bc, el('div', 'face back endpaper')]);
+  }
+
+  var L = leaves.map(function (pair, k) {
+    var leaf = el('div', 'leaf'); leaf.appendChild(pair[0]); leaf.appendChild(pair[1]); book.appendChild(leaf); return leaf;
+  });
+
+  var pos = 0; // number of flipped leaves
+  function render() {
+    L.forEach(function (leaf, k) {
+      var f = k < pos;
+      leaf.classList.toggle('flipped', f);
+      leaf.style.zIndex = f ? k + 1 : L.length - k;
+    });
+    book.classList.toggle('closed', pos === 0);
+    book.classList.toggle('ended', pos === L.length);
+    prevBtn.disabled = pos === 0; nextBtn.disabled = pos === L.length;
+    if (pos === 0) countEl.textContent = 'cover';
+    else if (pos === L.length) countEl.textContent = 'end';
+    else {
+      var left = 2 * (pos - 1) - 1, right = 2 * (pos - 1);
+      var shown = [left, right].filter(function (x) { return x >= 0 && x < NOTES.length; }).map(function (x) { return x + 1; });
+      countEl.textContent = shown.length ? shown.join('–') + ' / ' + NOTES.length : 'contents';
+    }
+    hint.style.visibility = pos === 0 ? 'visible' : 'hidden';
+  }
+  function setPos(p) {
+    p = Math.max(0, Math.min(L.length, p));
+    // keep the moving leaf on top during the turn
+    var moving = p > pos ? pos : p;
+    if (L[moving]) L[moving].style.zIndex = 1000;
+    pos = p; setTimeout(render, 0);
+  }
+  function next() { setPos(pos + 1); }
+  function prev() { setPos(pos - 1); }
+  function goTo(p) { setPos(p); }
+
+  prevBtn.onclick = prev; nextBtn.onclick = next;
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); });
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return; var d = e.changedTouches[0].clientX - tx; tx = null;
+    if (d < -40) next(); else if (d > 40) prev();
+  });
+
+  var scaler = document.getElementById('scaler');
+  function fit() {
+    var s = Math.min((window.innerWidth - 24) / 680, (window.innerHeight - 150) / 481, 1.35);
+    scaler.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit); fit();
+  render();
+})();
+</script>
+</body>
+</html>
