@@ -63,14 +63,17 @@
 
   .endpaper { background: #2B2A26; border-radius: 5px 0 0 5px; }
 
-  #nav { position: fixed; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; align-items: center;
+  #nav { position: fixed; left: 0; right: 0; bottom: 52px; display: flex; justify-content: center; align-items: center;
          gap: 18px; font: 13px "Courier New", monospace; color: #5E5B52; }
   #nav button { font: inherit; background: none; border: 1px solid #C9C5BA; color: #1A1915; width: 44px; height: 44px;
          border-radius: 50%; cursor: pointer; }
   #nav button:disabled { opacity: .3; cursor: default; }
   #nav button:not(:disabled):hover { border-color: #1A1915; }
+  #legal { position: fixed; left: 0; right: 0; bottom: 8px; margin: 0 auto; max-width: 640px; padding: 0 12px;
+          text-align: center; font: 10.5px/1.45 Georgia, "Times New Roman", serif; color: #8C887D; }
   #hint { position: fixed; left: 0; right: 0; top: 18px; text-align: center; font: 12px "Courier New", monospace; color: #8C887D; }
 </style>
+<script data-goatcounter="https://javiergarrues.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -84,6 +87,8 @@
   <span id="count"></span>
   <button id="next" aria-label="Next page">&rarr;</button>
 </div>
+
+<p id="legal">&copy; 2026 Javier Garrues Apecechea. All rights reserved. These notes are for personal study only. They may not be sold, redistributed or shared with anyone, in whole or in part, without my written permission. Unauthorized use may result in legal action.</p>
 
 <script>
 /* ------------------------------------------------------------------
@@ -126,7 +131,13 @@ var NOTES = [
     if (n.link) {
       f.className += ' link'; f.title = 'Open ' + n.title + ' notes';
       f.appendChild(el('span', 'open-hint', 'open notes &#8599;'));
-      f.addEventListener('click', function (ev) { ev.stopPropagation(); window.open(n.link, '_blank', 'noopener'); });
+      f.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        try { if (window.goatcounter && window.goatcounter.count)
+          window.goatcounter.count({ path: 'notes-' + n.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'), title: n.title + ' notes', event: true });
+        } catch (e) {}
+        window.open(n.link, '_blank', 'noopener');
+      });
     } else {
       f.addEventListener('click', function (ev) { ev.stopPropagation(); side === 'front' ? next() : prev(); });
     }
@@ -202,7 +213,7 @@ var NOTES = [
 
   var scaler = document.getElementById('scaler');
   function fit() {
-    var s = Math.min((window.innerWidth - 24) / 680, (window.innerHeight - 150) / 481, 1.35);
+    var s = Math.min((window.innerWidth - 24) / 680, (window.innerHeight - 220) / 481, 1.35);
     scaler.style.transform = 'scale(' + s + ')';
   }
   window.addEventListener('resize', fit); fit();
